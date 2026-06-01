@@ -67,17 +67,17 @@ func TestClangEndToEnd(t *testing.T) {
 				t.Fatalf("typecheck: %v", checker.Errors()[0])
 			}
 			cg := llvmir.New()
-			mod := cg.Compile(prog)
+			cg.Compile(prog)
 			if len(cg.Errors()) > 0 {
 				t.Fatalf("codegen: %v", cg.Errors()[0])
 			}
 			tmpDir := t.TempDir()
 			llFile := filepath.Join(tmpDir, "out.ll")
-			if err := os.WriteFile(llFile, []byte(mod.String()), 0644); err != nil {
+			if err := os.WriteFile(llFile, []byte(cg.IRString()), 0644); err != nil {
 				t.Fatalf("write .ll: %v", err)
 			}
 			binPath := filepath.Join(tmpDir, "test_bin")
-			cmd := exec.Command("clang", llFile, filepath.Join(runtimeDir, "io.c"), filepath.Join(runtimeDir, "tensor.c"), "-o", binPath)
+			cmd := exec.Command("clang", llFile, filepath.Join(runtimeDir, "io.c"), filepath.Join(runtimeDir, "tensor.c"), "-I"+runtimeDir, "-lm", "-o", binPath)
 			out, err := cmd.CombinedOutput()
 			if err != nil {
 				t.Fatalf("clang failed: %v\noutput: %s", err, out)

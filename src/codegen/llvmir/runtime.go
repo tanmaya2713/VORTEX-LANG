@@ -31,7 +31,7 @@ func (c *Codegen) declareRuntimeFuncs() {
 
 	c.rt.vortexInit = m.NewFunc("vortex_init", lltypes.Void)
 
-	tensorPtr := lltypes.NewPointer(tensorStructType)
+	tensorPtr := lltypes.NewPointer(getTensorStructType())
 
 	c.rt.vortexTensorCreate = m.NewFunc("vortex_tensor_create", tensorPtr,
 		ir.NewParam("shape", lltypes.NewPointer(lltypes.I32)),

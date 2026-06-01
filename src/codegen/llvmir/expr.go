@@ -351,7 +351,7 @@ func (c *Codegen) codegenIndex(e *ast.IndexExpr) value.Value {
 		tensorPtrVal := ir.NewLoad(tensorPtrType, tmpAlloca)
 		c.currentBlock.Insts = append(c.currentBlock.Insts, tensorPtrVal)
 
-		dataPtr := ir.NewGetElementPtr(tensorStructType, tensorPtrVal, zero, constant.NewInt(lltypes.I32, 2))
+		dataPtr := ir.NewGetElementPtr(getTensorStructType(), tensorPtrVal, zero, constant.NewInt(lltypes.I32, 2))
 		c.currentBlock.Insts = append(c.currentBlock.Insts, dataPtr)
 
 		dataLoad := ir.NewLoad(lltypes.NewPointer(lltypes.Float), dataPtr)

@@ -73,6 +73,30 @@ func New() *Codegen {
 
 func (c *Codegen) Errors() []error { return c.errors }
 
+// IRString returns the LLVM IR as a string with required struct type definitions.
+// It ensures that named struct types like VortexTensor are properly defined in the IR.
+func (c *Codegen) IRString() string {
+	ir := c.module.String()
+	// Inject the VortexTensor struct type definition if it's being used but not defined
+	if strings.Contains(ir, "%VortexTensor") {
+		if !strings.Contains(ir, "%VortexTensor = type") {
+			// Split the IR into lines
+			lines := strings.Split(ir, "\n")
+			// Find where to insert the struct definition (after the source_filename line if it exists)
+			insertIdx := 0
+			for i, line := range lines {
+				if strings.HasPrefix(line, "source_filename") || strings.HasPrefix(line, "; ModuleID") {
+					insertIdx = i + 1
+				}
+			}
+			// Insert the struct definition
+			lines = append(lines[:insertIdx], append([]string{"%VortexTensor = type { i32*, i32, float* }", ""}, lines[insertIdx:]...)...)
+			ir = strings.Join(lines, "\n")
+		}
+	}
+	return ir
+}
+
 func (c *Codegen) addError(pos common.Position, format string, args ...interface{}) {
 	c.errors = append(c.errors, common.NewError("codegen", pos, fmt.Sprintf(format, args...)))
 }

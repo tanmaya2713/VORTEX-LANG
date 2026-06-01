@@ -6,7 +6,9 @@ import (
 	vtypes "github.com/vortex-lang/vortex/src/types"
 )
 
-var tensorStructType = func() lltypes.Type {
+// getTensorStructType returns a named struct type for VortexTensor.
+// Note: This is used in toLLVMType() and should match the struct created in declareRuntimeFuncs().
+func getTensorStructType() lltypes.Type {
 	st := lltypes.NewStruct(
 		lltypes.NewPointer(lltypes.I32),
 		lltypes.I32,
@@ -14,7 +16,7 @@ var tensorStructType = func() lltypes.Type {
 	)
 	st.SetName("VortexTensor")
 	return st
-}()
+}
 
 func toLLVMType(t vtypes.Type) lltypes.Type {
 	switch t.Kind() {
@@ -37,7 +39,7 @@ func toLLVMType(t vtypes.Type) lltypes.Type {
 	case common.TypeString:
 		return lltypes.I8Ptr
 	case common.TypeTensor:
-		return lltypes.NewPointer(tensorStructType)
+		return lltypes.NewPointer(getTensorStructType())
 	case common.TypeModel, common.TypeLayer, common.TypeStruct:
 		return lltypes.I8Ptr
 	case common.TypeArray:

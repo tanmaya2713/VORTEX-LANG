@@ -209,7 +209,7 @@ func compileToBinary(inputFile, binPath, targetOS string, shared bool) error {
 		return fmt.Errorf("type checking failed")
 	}
 	cg := llvmir.New()
-	mod := cg.Compile(compiler.program)
+	cg.Compile(compiler.program)
 	if len(cg.Errors()) > 0 {
 		return cg.Errors()[0]
 	}
@@ -219,7 +219,7 @@ func compileToBinary(inputFile, binPath, targetOS string, shared bool) error {
 	}
 	defer os.RemoveAll(tmpDir)
 	llPath := filepath.Join(tmpDir, "out.ll")
-	if err := os.WriteFile(llPath, []byte(mod.String()), 0644); err != nil {
+	if err := os.WriteFile(llPath, []byte(cg.IRString()), 0644); err != nil {
 		return fmt.Errorf("write .ll: %w", err)
 	}
 	files := map[string]string{
@@ -239,7 +239,7 @@ func compileToBinary(inputFile, binPath, targetOS string, shared bool) error {
 	if _, err := exec.LookPath("clang"); err != nil {
 		return fmt.Errorf("Clang not found in PATH. vortex build requires Clang.")
 	}
-	clangArgs := []string{"out.ll", "io.c", "tensor.c", "-o", binPath}
+	clangArgs := []string{"out.ll", "io.c", "tensor.c", "-I" + tmpDir, "-lm", "-o", binPath}
 	if shared {
 		clangArgs = append(clangArgs, "-shared", "-fPIC")
 	}
