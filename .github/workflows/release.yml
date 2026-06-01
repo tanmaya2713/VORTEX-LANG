@@ -99,3 +99,6 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           files: vortex-*.zip
+          tag_name: 'nightly'
+          name: 'Vortex Nightly Build'
+          prerelease: true
