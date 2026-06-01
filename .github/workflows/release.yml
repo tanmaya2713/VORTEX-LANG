@@ -58,9 +58,9 @@ jobs:
 
       - name: Setup Android NDK
         if: matrix.goos == 'android'
-        uses: android-ndk/ndk-setup@v1
+        uses: nttld/setup-ndk@v1
         with:
-          ndk-version: r27
+          ndk-version: r25b
 
       - name: Set CC for target
         id: cc
