@@ -20,13 +20,18 @@ func TestClangEndToEnd(t *testing.T) {
 	}
 
 	runtimeDir := t.TempDir()
-	for _, name := range []string{"io.c", "tensor.c"} {
-		src, err := vxruntime.RuntimeFS.ReadFile(name)
+	files := map[string]string{
+		"io.c":     "c_lib/io.c",
+		"tensor.c": "c_lib/tensor.c",
+		"tensor.h": "c_lib/tensor.h",
+	}
+	for outName, srcPath := range files {
+		src, err := vxruntime.RuntimeFS.ReadFile(srcPath)
 		if err != nil {
-			t.Fatalf("read embedded %s: %v", name, err)
+			t.Fatalf("read embedded %s: %v", srcPath, err)
 		}
-		if err := os.WriteFile(filepath.Join(runtimeDir, name), src, 0644); err != nil {
-			t.Fatalf("write %s: %v", name, err)
+		if err := os.WriteFile(filepath.Join(runtimeDir, outName), src, 0644); err != nil {
+			t.Fatalf("write %s: %v", outName, err)
 		}
 	}
 

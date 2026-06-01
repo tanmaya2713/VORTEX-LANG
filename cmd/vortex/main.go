@@ -222,13 +222,18 @@ func compileToBinary(inputFile, binPath, targetOS string, shared bool) error {
 	if err := os.WriteFile(llPath, []byte(mod.String()), 0644); err != nil {
 		return fmt.Errorf("write .ll: %w", err)
 	}
-	for _, name := range []string{"io.c", "tensor.c", "tensor.h"} {
-		src, err := vxruntime.RuntimeFS.ReadFile(name)
+	files := map[string]string{
+		"io.c":     "c_lib/io.c",
+		"tensor.c": "c_lib/tensor.c",
+		"tensor.h": "c_lib/tensor.h",
+	}
+	for outName, srcPath := range files {
+		src, err := vxruntime.RuntimeFS.ReadFile(srcPath)
 		if err != nil {
-			return fmt.Errorf("read embedded %s: %w", name, err)
+			return fmt.Errorf("read embedded %s: %w", srcPath, err)
 		}
-		if err := os.WriteFile(filepath.Join(tmpDir, name), src, 0644); err != nil {
-			return fmt.Errorf("write %s: %w", name, err)
+		if err := os.WriteFile(filepath.Join(tmpDir, outName), src, 0644); err != nil {
+			return fmt.Errorf("write %s: %w", outName, err)
 		}
 	}
 	if _, err := exec.LookPath("clang"); err != nil {
