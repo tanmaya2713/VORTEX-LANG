@@ -13,44 +13,88 @@ jobs:
           - os: ubuntu-latest
             goos: linux
             goarch: amd64
+            test: true
+
           - os: ubuntu-latest
             goos: linux
             goarch: arm64
+            test: false
+
           - os: windows-latest
             goos: windows
             goarch: amd64
-          - os: macos-latest
+            test: true
+
+          - os: macos-13
             goos: darwin
             goarch: amd64
-          - os: macos-latest
+            test: true
+
+          - os: macos-14
             goos: darwin
             goarch: arm64
+            test: true
+
           - os: ubuntu-latest
             goos: android
             goarch: arm64
+            test: false
+
     runs-on: ${{ matrix.os }}
     env:
       CGO_ENABLED: '1'
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-go@v5
         with:
           go-version: '1.22'
-      - run: go test ./...
+
+      - name: Install ARM64 cross-compiler
+        if: matrix.goos == 'linux' && matrix.goarch == 'arm64'
+        run: sudo apt-get update && sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      - name: Setup Android NDK
+        if: matrix.goos == 'android'
+        uses: android-ndk/ndk-setup@v1
+        with:
+          ndk-version: r27
+
+      - name: Set CC for target
+        id: cc
+        shell: bash
+        run: |
+          if [ "${{ matrix.goos }}" = "linux" ] && [ "${{ matrix.goarch }}" = "arm64" ]; then
+            echo "CC=aarch64-linux-gnu-gcc" >> "$GITHUB_OUTPUT"
+          elif [ "${{ matrix.goos }}" = "android" ]; then
+            echo "CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang" >> "$GITHUB_OUTPUT"
+          else
+            echo "CC=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Test
+        if: matrix.test
+        run: go test ./...
+
       - name: Build
         shell: bash
+        env:
+          CC: ${{ steps.cc.outputs.CC }}
         run: |
           mkdir -p bin
           EXT=""
           [ "${{ matrix.goos }}" = "windows" ] && EXT=".exe"
-          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} \
-            go build -o bin/vortex-${{ matrix.goos }}-${{ matrix.goarch }}$EXT ./cmd/vortex
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build \
+            -o bin/vortex-${{ matrix.goos }}-${{ matrix.goarch }}$EXT ./cmd/vortex
+
       - name: Package
         shell: bash
         run: |
           cd bin
           zip ../vortex-${{ github.ref_name }}-${{ matrix.goos }}-${{ matrix.goarch }}.zip \
             vortex-${{ matrix.goos }}-${{ matrix.goarch }}*
+
       - uses: softprops/action-gh-release@v2
         with:
           files: vortex-*.zip
