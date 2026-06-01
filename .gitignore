@@ -1,0 +1,21 @@
+# Binaries
+*.exe
+*.out
+/vortex
+
+# LLVM/object intermediates
+*.o
+*.ll
+*.bc
+
+# Temp/extraction dirs
+dist_test/
+tmp/
+
+# OS cache
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
