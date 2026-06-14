@@ -1,0 +1,44 @@
+model LinearClassifier {
+    fc1 = dense, units=128, activation=relu
+    fc2 = dense, units=10, activation=sigmoid
+}
+
+struct Matrix2x2 {
+    a: f64,
+    b: f64,
+    c: f64,
+    d: f64,
+}
+
+fn main() {
+    let x: i32 = 42;
+    let y: i32 = 58;
+    assert(x + y == 100);
+
+    let a: f64 = 3.14159;
+    let b: f64 = 2.71828;
+    assert(a * b > 8.5);
+
+    let flag: bool = true;
+    assert(flag);
+
+    let outer = [1, 2, 3];
+    let inner = [10, 20];
+
+    for i in outer {
+        for j in inner {
+            let sum: i32 = i + j;
+            assert(sum > 0);
+        }
+    }
+
+    assert((1 + 2) * 3 == 9);
+    assert(100 / 5 / 2 == 10);
+    assert(2 * 3 + 4 * 5 == 26);
+
+    let mat: tensor<f32, [2, 2]> = [1.0, 2.0, 3.0, 4.0];
+    let result = mat * mat;
+
+    print(99);
+    print("stress_test_complete");
+}
