@@ -1,0 +1,96 @@
+// ============================================================================
+// VORTEX LANG V8.1 ASCENDED CORE - FEATURE SHOWCASE
+// This file demonstrates the complete syntax and capabilities natively
+// supported by the Vortex Python Interpreter.
+// ============================================================================
+
+print("==================================================");
+print("   VORTEX V8.1 ASCENDED CORE - SYNTAX SHOWCASE");
+print("==================================================");
+
+// --- 1. Variables & Mutability ---
+print("\n[1] VARIABLES & MUTABILITY");
+let pi = 3.14159;                 // Immutable assignment
+let mut counter = 0;              // Mutable assignment
+let greeting = "Hello, Vortex!";  // String assignment
+let numbers = [1, 2, 3, 4, 5];    // List / Array assignment
+print("Initialized variables. Greeting:");
+print(greeting);
+
+// --- 2. Mathematical Built-ins ---
+print("\n[2] MATHEMATICAL BUILT-INS");
+let root = sqrt(144);             // Returns 12.0
+let power = pow(2);               // Returns 4.0
+let rand_val = random(100);       // Random float between 0 and 100
+let abs_val = abs(-50);           // Returns 50
+print("Square root of 144:");
+print(root);
+print("Random value between 0-100:");
+print(rand_val);
+
+// --- 3. Assertions & Reflection ---
+print("\n[3] ASSERTIONS & REFLECTION");
+assert(root == 12, "Math engine is broken!");
+assert(type_of(greeting) == "str", "Type checking failed!");
+assert(length(numbers) == 5, "Array length check failed!");
+print("All assertions passed. Reflection validated.");
+
+// --- 4. Control Flow (If / Else) ---
+print("\n[4] CONTROL FLOW (IF / ELSE)");
+if (counter < 10) {
+    counter = counter + 1;
+    print("Counter dynamically incremented inside 'if' block.");
+} else {
+    counter = 0;
+}
+
+// --- 5. Loops (For / While / Break / Continue) ---
+print("\n[5] LOOPS & BRANCHING");
+let mut sum = 0;
+
+for x in numbers {
+    if (x == 3) {
+        continue;                 // Skip processing when x is 3
+    }
+    sum = sum + x;
+}
+print("Sum of array elements (skipping 3):");
+print(sum);
+
+while (counter < 5) {
+    counter = counter + 1;
+    if (counter == 4) {
+        print("Escaping while loop early using 'break'");
+        break;                    // Escape loop early
+    }
+}
+
+// --- 6. Custom Functions ---
+print("\n[6] CUSTOM FUNCTIONS");
+fn calculate_area(radius) {
+    let area = pi * (radius * radius);
+    return area;
+}
+
+let circle_area = calculate_area(5);
+print("Calculated Area of circle (r=5):");
+print(circle_area);
+
+// --- 7. Networking & Sandboxed File I/O ---
+print("\n[7] NETWORKING & SANDBOXED FILE I/O");
+print("Fetching JSON from remote API via GET...");
+request "https://jsonplaceholder.typicode.com/todos/1" into web_data;
+print(web_data);
+
+print("Saving fetched payload securely to CWD...");
+save web_data into "vortex_output.json";
+
+print("Loading payload directly back into memory...");
+load "vortex_output.json" into local_cache;
+
+assert(type_of(local_cache) == "dict", "JSON payload was not parsed correctly!");
+print("File successfully loaded and natively validated as a dictionary!");
+
+print("\n==================================================");
+print("   SHOWCASE COMPLETE - SYSTEM STABLE");
+print("==================================================");
