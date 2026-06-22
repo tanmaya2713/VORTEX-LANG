@@ -143,205 +143,191 @@ vortex build main.vx --target android --shared
 
 ## Documentation
 
-### General
+### General ✅
 
-`fn main()` is the entry point for the program. The file must end with `}`. Anything outside `fn main()` is treated as global or ignored. Use `import` for external modules and `assert` for compile-time invariant checks.
+Vortex supports top-level execution. You can write code directly without any wrappers. If you wrap code in `fn main()`, you must explicitly invoke it using `let run = main();`. Use `import` for external modules and `assert` for compile-time invariant checks.
 
-```vortex
+```rust
 // This is ignored or treated as global
 
-fn main() {
-    // Write code here
-    assert(1 + 1 == 2);
-}
+// Write code here
+assert(1 + 1 == 2);
 
 // This too is ignored
 ```
 
 ---
 
-### Variables
+### Variables ✅
 
 Variables are declared using `let`. Use `mut` for mutable variables that can be reassigned.
 
-```vortex
-fn main() {
-    let a = 10;
-    let b = "two";
-    let c = 15;
-    a = a + 1;
-    b = "Vortex";
-    c = c * 2;
-}
+```rust
+let a = 10;
+let b = "two";
+let c = 15;
+a = a + 1;
+b = "Vortex";
+c = c * 2;
 ```
 
 ---
 
 ### Data Types
 
+> **Status:** Standard types (int, string, bool) are **✅ Working**. Advanced types (`tensor` and `struct`) are **🚧 In Progress** and will be fully supported in future compiler updates.
+
 Numbers, strings, and booleans work like other languages. Tensor types are native for AI workloads. `true` and `false` are the boolean values. Structural types are defined with `struct`.
 
-```vortex
-fn main() {
-    let a = 10;                  // int
-    let b = 10 + (15 * 20);      // int expression
-    let c = "hello";             // string
-    let d = 'ok';                // string (single quotes)
-    let e = true;                // bool
-    let f = false;               // bool
-    let g: tensor<2,3> = [[1, 2, 3], [4, 5, 6]];  // tensor
+```rust
+let a = 10;                  // int
+let b = 10 + (15 * 20);      // int expression
+let c = "hello";             // string
+let d = 'ok';                // string (single quotes)
+let e = true;                // bool
+let f = false;               // bool
+let g: tensor<2,3> = [[1, 2, 3], [4, 5, 6]];  // tensor
 
-    struct Point { x: i32; y: i32; }
-    let p = Point { x: 10, y: 20 };
-}
+struct Point { x: i32; y: i32; }
+let p = Point { x: 10, y: 20 };
 ```
 
 ---
 
 ### Built-ins & AI Power
 
+> **Status:** Core built-ins like `print()` are **✅ Working**. Native AI constructs (`tensor` math, `model`, `layer`, `train`) are **🚀 Future Roadmap** features and currently throw a panic in the compiler.
+
 Use `print()` to output anything to the console. Tensor operations are first-class citizens with native type syntax and runtime-accelerated math.
 
-```vortex
-fn main() {
-    print("Hello World");
+```rust
+print("Hello World");
 
-    let a = 10;
-    let b = 20;
-    print(a + b);
+let a = 10;
+let b = 20;
+print(a + b);
 
-    // Native tensor matrix multiplication (using overloaded * operator)
-    let t: tensor<2,2> = [[1, 2], [3, 4]];
-    let result = t * t;
-    print(result);
-}
+// Native tensor matrix multiplication (using overloaded * operator)
+let t: tensor<2,2> = [[1, 2], [3, 4]];
+let result = t * t;
+print(result);
 ```
 
 Native AI constructs — `model`, `layer`, and `train` — enable declarative neural network definitions:
 
-```vortex
+```rust
 model MyNet {
     layer hidden = dense(128, relu);
     layer output = dense(10, sigmoid);
 }
 
-fn main() {
-    train model=MyNet, data=dataset, epochs=10;
-}
+train model=MyNet, data=dataset, epochs=10;
 ```
 
 ---
 
-### V2 Omniversal Core — OS & Web I/O
+### V2 Omniversal Core — OS & Web I/O ✅
+
+> **Status:** **✅ Working** (Gracefully handles errors for non-existent files or URLs).
 
 Vortex V2 introduces operating system level file interaction and live API data fetching — directly from your `.vx` scripts.
 
-```vortex
-fn main() {
-    // Save variables to disk
-    let data = "Hello, file system!";
-    save data into "output.txt";
+```rust
+// Save variables to disk
+let data = "Hello, file system!";
+save data into "output.txt";
 
-    // Load JSON from disk
-    load "config.json" into config;
-    print(config);
+// Load JSON from disk
+load "config.json" into config;
+print(config);
 
-    // Fetch live JSON from a REST API
-    request "https://api.example.com/data" into response;
-    print(response);
-}
+// Fetch live JSON from a REST API
+request "https://api.example.com/data" into response;
+print(response);
 ```
 
 The `save` keyword writes any variable (including JSON objects) to a file. The `load` keyword reads files and auto-detects JSON vs plain text. The `request` keyword performs read-only HTTP GET requests and returns parsed JSON.
 
 ---
 
-### V3 Ascended Core — JSON, Arrays & Extended Math
+### V3 Ascended Core — JSON, Arrays & Extended Math ✅
 
 V3 brings dictionary-style JSON parsing, native Arrays, and a powerful expanded standard library.
 
-```vortex
-fn main() {
-    // Native Arrays
-    let arr = [1, 2, 3, 4, 5];
+```rust
+// Native Arrays
+let arr = [1, 2, 3, 4, 5];
 
-    // JSON dictionary access
-    load "data.json" into obj;
-    print(obj["key"]);
+// JSON dictionary access
+load "data.json" into obj;
+print(obj["key"]);
 
-    // Extended math builtins
-    let x = 2.0;
-    print(sin(x));
-    print(cos(x));
-    print(tan(x));
-    print(sqrt(x));
-    print(pow(x));
+// Extended math builtins
+let x = 2.0;
+print(sin(x));
+print(cos(x));
+print(tan(x));
+print(sqrt(x));
+print(pow(x));
 
-    // Utility builtins
-    print(length("hello"));   // → 5
-    print(type_of(42));       // → "int"
-    print(str(3.14));         // → "3.14"
-}
+// Utility builtins
+print(length("hello"));   // → 5
+print(type_of(42));       // → "int"
+print(str(3.14));         // → "3.14"
 ```
 
 Available builtins: `random`, `sqrt`, `round`, `abs`, `pow`, `sin`, `cos`, `tan`, `length`, `type_of`, `str`.
 
 ---
 
-### Conditionals
+### Conditionals ✅
 
 Vortex supports `if`, `else if`, and `else` blocks.
 
-```vortex
-fn main() {
-    let a = 10;
+```rust
+let a = 10;
 
-    if (a < 20) {
-        print("a is less than 20");
-    } else if (a < 25) {
-        print("a is less than 25");
-    } else {
-        print("a is greater than or equal to 25");
-    }
+if (a < 20) {
+    print("a is less than 20");
+} else if (a < 25) {
+    print("a is less than 25");
+} else {
+    print("a is greater than or equal to 25");
 }
 ```
 
 ---
 
-### Loops
+### Loops ✅
 
 Statements inside a `while` block execute as long as the condition evaluates to `true`. Use `break` to exit the loop and `continue` to skip to the next iteration.
 
-```vortex
-fn main() {
-    let a = 0;
+```rust
+let a = 0;
 
-    while (a < 10) {
-        a = a + 1;
+while (a < 10) {
+    a = a + 1;
 
-        if (a == 5) {
-            print("skipping five");
-            continue;
-        }
-
-        if (a == 8) {
-            break;
-        }
-
-        print(a);
+    if (a == 5) {
+        print("skipping five");
+        continue;
     }
 
-    print("done");
+    if (a == 8) {
+        break;
+    }
+
+    print(a);
 }
+
+print("done");
 ```
 
 Vortex also supports `for` loops for iterating over array or tensor elements with an index variable:
 
-```vortex
-fn main() {
-    for i in [1, 2, 3, 4, 5] {
-        print(i);
-    }
+```rust
+for i in [1, 2, 3, 4, 5] {
+    print(i);
 }
 ```
 
